@@ -2,9 +2,17 @@ body {
   background-color: wheat;
 }
 
+form {
+  margin-bottom: 10px;
+}
+
 .balloon {
   height: 120px;
   width: 100px;
   background-color: blue;
   border-radius: 50%;
+}
+
+.hidden{
+  display: none;
 }
