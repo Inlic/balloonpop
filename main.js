@@ -8,7 +8,7 @@ let inflationRate = 20
 let maxsize = 300
 let highestPopCount = 0
 let currentPopCount = 0
-let gameLength = 5000
+let gameLength = 10000
 let clockId = 0
 let timeRemaining = 0
 let currentPlayer = {}
@@ -20,6 +20,7 @@ let colorList = ["red","green","blue","purple","pink"]
 function startGame(){
   document.getElementById("game-controls").classList.remove("hidden");
   document.getElementById("main-controls").classList.add("hidden");
+  document.getElementById("scoreboard").classList.add("hidden");
   startClock();
   setTimeout(stopGame,gameLength);  
 }
@@ -34,32 +35,32 @@ function stopClock(){
 }
 
 function inflate(){
-  clickCount++
-  height+=inflationRate
-  width+=inflationRate
-  
-  if(height >= maxsize){
-    popReset();
-  }
+  clickCount++;
+  height+=inflationRate;
+  width+=inflationRate;
+  popReset();
   draw();
 }
 
 function popReset(){
+  if(height >= maxsize){
   console.log("pop the balloon")
   let balloonElement = document.getElementById("balloon")
   balloonElement.classList.remove(currentColor);
   getRandomColor()
   balloonElement.classList.add(currentColor);
-  height = 0
-  width = 0
+  // @ts-ignore
+  document.getElementById("pop-sound").play();
   currentPopCount++
+  height = 40
+  width = 0
+  }
 }
 
 function getRandomColor(){
   let i = Math.floor(Math.random()*colorList.length);
   currentColor = colorList[i];
 }
-
 
 function drawClock(){
   let countdownElem = document.getElementById("countdown");
@@ -89,7 +90,8 @@ function stopGame() {
 
     document.getElementById("game-controls").classList.add("hidden");
     document.getElementById("main-controls").classList.remove("hidden");
-
+    document.getElementById("scoreboard").classList.remove("hidden");
+    
     clickCount = 0;
     height = 120;
     width = 100;
@@ -99,8 +101,11 @@ function stopGame() {
       savePlayers()
     }
 
+    currentPopCount = 0;
+
     stopClock();
     draw();
+    drawScoreboard();
 }
 
 //#endregion
@@ -112,22 +117,23 @@ let players = []
 loadPlayers()
 
 function setPlayer(event){
-  event.preventDefault()
-  let form = event.target
-  let playerName = form.playerName.value
+  event.preventDefault();
+  let form = event.target;
+  let playerName = form.playerName.value;
   
-  currentPlayer = players.find(player => player.name === playerName)
+  currentPlayer = players.find(player => player.name === playerName);
 
   if(!currentPlayer){
-    currentPlayer = {name: playerName,topScore: 0}
-    players.push(currentPlayer)
-    savePlayers()
+    currentPlayer = {name: playerName,topScore: 0};
+    players.push(currentPlayer);
+    savePlayers();
   }
 
-  form.reset()
-  document.getElementById("game").classList.remove("hidden")
-  form.classList.add("hidden")
-  draw()
+  form.reset();
+  document.getElementById("game").classList.remove("hidden");
+  form.classList.add("hidden");
+  draw();
+  drawScoreboard();
 }
 
 function changePlayer(){
@@ -146,4 +152,26 @@ function loadPlayers(){
     players = playersData
   }
 }
+
+function drawScoreboard(){
+  let template ="";
+  players.sort((p1,p2)=> p2.topScore - p1.topScore)
+  players.forEach(player => {
+    template += `
+    <div class="d-flex space-between">
+          <span>
+           <i class="fa fa-user-circle" aria-hidden="true"></i>
+           ${player.name}
+          </span>
+          <span>
+           score: ${player.topScore}
+          </span>
+    </div>
+    `
+  })
+  document.getElementById("players").innerHTML = template;
+}
+
+drawScoreboard();
+
 //#endregion
