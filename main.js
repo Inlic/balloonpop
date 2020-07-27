@@ -1,12 +1,3 @@
-
-
-
-
-// Buttons
-let startButton = document.getElementById("start-button")
-let inflateButton = document.getElementById("inflate-button")
-
-
 //#region  data and game
 
 //Data
@@ -21,12 +12,14 @@ let gameLength = 5000
 let clockId = 0
 let timeRemaining = 0
 let currentPlayer = {}
+let currentColor = "red"
+let colorList = ["red","green","blue","purple","pink"]
 
 
 // Game Logic
 function startGame(){
-  startButton.setAttribute("disabled","true");
-  inflateButton.removeAttribute("disabled");
+  document.getElementById("game-controls").classList.remove("hidden");
+  document.getElementById("main-controls").classList.add("hidden");
   startClock();
   setTimeout(stopGame,gameLength);  
 }
@@ -51,6 +44,23 @@ function inflate(){
   draw();
 }
 
+function popReset(){
+  console.log("pop the balloon")
+  let balloonElement = document.getElementById("balloon")
+  balloonElement.classList.remove(currentColor);
+  getRandomColor()
+  balloonElement.classList.add(currentColor);
+  height = 0
+  width = 0
+  currentPopCount++
+}
+
+function getRandomColor(){
+  let i = Math.floor(Math.random()*colorList.length);
+  currentColor = colorList[i];
+}
+
+
 function drawClock(){
   let countdownElem = document.getElementById("countdown");
   countdownElem.innerText = (timeRemaining/1000).toString();
@@ -62,27 +72,23 @@ function draw(){
   let clickCountElem = document.getElementById("click-count");
   let popCountElem = document.getElementById("pop-count");
   let highestPopCountElem = document.getElementById("high-pop-count");
-  
+  let playerNameElem = document.getElementById("player-name");
+
   balloonElement.style.height = height+"px";
   balloonElement.style.width = width+"px";
   
   clickCountElem.innerText = clickCount.toString();
   popCountElem.innerText = currentPopCount.toString();
   highestPopCountElem.innerText = currentPlayer.topScore.toString();
-}
 
-function popReset(){
-    console.log("pop the balloon")
-    height = 0
-    width = 0
-    currentPopCount++
+  playerNameElem.innerText = currentPlayer.name;
 }
 
 function stopGame() {
     console.log("the game is over")
 
-    startButton.removeAttribute("disabled");
-    inflateButton.setAttribute("disabled","true");
+    document.getElementById("game-controls").classList.add("hidden");
+    document.getElementById("main-controls").classList.remove("hidden");
 
     clickCount = 0;
     height = 120;
@@ -100,6 +106,7 @@ function stopGame() {
 //#endregion
 
 
+//#region Players
 
 let players = []
 loadPlayers()
@@ -139,3 +146,4 @@ function loadPlayers(){
     players = playersData
   }
 }
+//#endregion
